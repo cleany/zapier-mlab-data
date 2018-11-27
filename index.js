@@ -1,4 +1,4 @@
-const Recipe = require('./resources/recipe');
+const Document = require('./resources/document');
 
 const addAuthHeader = (request, z, bundle) => {
   // Hard-coded authentication just for demo
@@ -19,7 +19,7 @@ const App = {
 
   // If you want your resource to show up, you better include it here!
   resources: {
-    [Recipe.key]: Recipe
+    [Document.key]: Document
   },
 
   // If you want your trigger to show up, you better include it here!

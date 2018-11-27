@@ -1,13 +1,13 @@
 const _sharedBaseUrl = 'https://auth-json-server.zapier.ninja';
 
-const getRecipe = (z, bundle) => {
+const getDocument = (z, bundle) => {
   return z.request({
       url: `${_sharedBaseUrl}/recipes/${bundle.inputData.id}`
     })
     .then((response) => JSON.parse(response.content));
 };
 
-const listRecipes = (z, bundle) => {
+const listDocuments = (z, bundle) => {
   return z.request({
       url: _sharedBaseUrl + '/recipes',
       params: {
@@ -17,7 +17,7 @@ const listRecipes = (z, bundle) => {
     .then((response) => JSON.parse(response.content));
 };
 
-const createRecipe = (z, bundle) => {
+const createDocument = (z, bundle) => {
   const requestOptions = {
     url: _sharedBaseUrl + '/recipes',
     method: 'POST',
@@ -35,7 +35,7 @@ const createRecipe = (z, bundle) => {
     .then((response) => JSON.parse(response.content));
 };
 
-const searchRecipe = (z, bundle) => {
+const searchDocument = (z, bundle) => {
   return z.request({
       url: _sharedBaseUrl + '/recipes',
       params: {
@@ -43,11 +43,11 @@ const searchRecipe = (z, bundle) => {
       }
     })
     .then((response) => {
-      const matchingRecipes = JSON.parse(response.content);
+      const matchingDocuments = JSON.parse(response.content);
 
-      // Only return the first matching recipe
-      if (matchingRecipes && matchingRecipes.length) {
-        return [matchingRecipes[0]];
+      // Only return the first matching document
+      if (matchingDocuments && matchingDocuments.length) {
+        return [matchingDocuments[0]];
       }
 
       return [];
@@ -63,38 +63,38 @@ const sample = {
   style: 'italian',
 };
 
-// This file exports a Recipe resource. The definition below contains all of the keys available,
+// This file exports a Document resource. The definition below contains all of the keys available,
 // and implements the list and create methods.
 module.exports = {
-  key: 'recipe',
-  noun: 'Recipe',
+  key: 'document',
+  noun: 'Document',
   // The get method is used by Zapier to fetch a complete representation of a record. This is helpful when the HTTP
   // response from a create call only return an ID, or a search that only returns a minimuml representation of the
   // record. Zapier will follow these up with the get() to retrieve the entire object.
   get: {
     display: {
-      label: 'Get Recipe',
-      description: 'Gets a recipe.',
+      label: 'Get Document',
+      description: 'Gets a document.',
     },
     operation: {
       inputFields: [
         {key: 'id', required: true},
       ],
-      perform: getRecipe,
+      perform: getDocument,
       sample: sample
     },
   },
   // The list method on this resource becomes a Trigger on the app. Zapier will use polling to watch for new records
   list: {
     display: {
-      label: 'New Recipe',
-      description: 'Trigger when a new recipe is added.',
+      label: 'New Document',
+      description: 'Trigger when a new document is added.',
     },
     operation: {
       inputFields: [
         {key: 'style', type: 'string', helpText: 'Explain what style of cuisine this is.'},
       ],
-      perform: listRecipes,
+      perform: listDocuments,
       sample: sample
     },
   },
@@ -107,31 +107,31 @@ module.exports = {
   // The create method on this resource becomes a Write on this app
   create: {
     display: {
-      label: 'Create Recipe',
-      description: 'Creates a new recipe.',
+      label: 'Create Document',
+      description: 'Creates a new document.',
     },
     operation: {
       inputFields: [
         {key: 'name', required: true, type: 'string'},
-        {key: 'directions', required: true, type: 'text', helpText: 'Explain how should one make the recipe, step by step.'},
+        {key: 'directions', required: true, type: 'text', helpText: 'Explain how should one make the document, step by step.'},
         {key: 'authorId', required: true, type: 'integer', label: 'Author ID'},
         {key: 'style', required: false, type: 'string', helpText: 'Explain what style of cuisine this is.'},
       ],
-      perform: createRecipe,
+      perform: createDocument,
       sample: sample
     },
   },
   // The search method on this resource becomes a Search on this app
   search: {
     display: {
-      label: 'Find Recipe',
-      description: 'Finds an existing recipe by name.',
+      label: 'Find Document',
+      description: 'Finds an existing document by name.',
     },
     operation: {
       inputFields: [
         {key: 'name', required: true, type: 'string'},
       ],
-      perform: searchRecipe,
+      perform: searchDocument,
       sample: sample
     },
   },
