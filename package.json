@@ -1,0 +1,25 @@
+{
+  "name": "zapier-mlab-data",
+  "version": "1.0.0",
+  "description": "A Zapier end point for mongoDb mLab REST API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cleany/zapier-mlab-data.git"
+  },
+  "keywords": [
+    "zapier",
+    "mongodb",
+    "mlab",
+    "rest"
+  ],
+  "author": "Sébastien Boulle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cleany/zapier-mlab-data/issues"
+  },
+  "homepage": "https://github.com/cleany/zapier-mlab-data#readme"
+}
