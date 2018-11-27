@@ -9,8 +9,8 @@ describe('document resource', () => {
   it('should get an existing document', (done) => {
     const bundle = {
       inputData: {
-        id: 1
-      }
+        id: 1,
+      },
     };
 
     appTester(App.resources.document.get.operation.perform, bundle)
@@ -25,8 +25,8 @@ describe('document resource', () => {
   it('should list existing documents', (done) => {
     const bundle = {
       inputData: {
-        style: 'style 2'
-      }
+        style: 'style 2',
+      },
     };
 
     appTester(App.resources.document.list.operation.perform, bundle)
@@ -46,8 +46,8 @@ describe('document resource', () => {
       inputData: {
         name: 'Smith Family Document',
         directions: '1. Order out :)',
-        authorId: 1
-      }
+        authorId: 1,
+      },
     };
 
     appTester(App.resources.document.create.operation.perform, bundle)
@@ -62,7 +62,7 @@ describe('document resource', () => {
     const bundle = {
       inputData: {
         name: 'Smith Family Document',
-      }
+      },
     };
 
     appTester(App.resources.document.search.operation.perform, bundle)

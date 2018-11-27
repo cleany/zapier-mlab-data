@@ -1,18 +1,20 @@
 const _sharedBaseUrl = 'https://auth-json-server.zapier.ninja';
 
 const getDocument = (z, bundle) => {
-  return z.request({
-      url: `${_sharedBaseUrl}/recipes/${bundle.inputData.id}`
+  return z
+    .request({
+      url: `${_sharedBaseUrl}/recipes/${bundle.inputData.id}`,
     })
     .then((response) => JSON.parse(response.content));
 };
 
 const listDocuments = (z, bundle) => {
-  return z.request({
+  return z
+    .request({
       url: _sharedBaseUrl + '/recipes',
       params: {
-        style: bundle.inputData.style
-      }
+        style: bundle.inputData.style,
+      },
     })
     .then((response) => JSON.parse(response.content));
 };
@@ -27,20 +29,22 @@ const createDocument = (z, bundle) => {
       authorId: bundle.inputData.authorId,
     }),
     headers: {
-      'content-type': 'application/json'
-    }
+      'content-type': 'application/json',
+    },
   };
 
-  return z.request(requestOptions)
+  return z
+    .request(requestOptions)
     .then((response) => JSON.parse(response.content));
 };
 
 const searchDocument = (z, bundle) => {
-  return z.request({
+  return z
+    .request({
       url: _sharedBaseUrl + '/recipes',
       params: {
-        nameSearch: bundle.inputData.name
-      }
+        nameSearch: bundle.inputData.name,
+      },
     })
     .then((response) => {
       const matchingDocuments = JSON.parse(response.content);
@@ -77,11 +81,9 @@ module.exports = {
       description: 'Gets a document.',
     },
     operation: {
-      inputFields: [
-        {key: 'id', required: true},
-      ],
+      inputFields: [{ key: 'id', required: true }],
       perform: getDocument,
-      sample: sample
+      sample: sample,
     },
   },
   // The list method on this resource becomes a Trigger on the app. Zapier will use polling to watch for new records
@@ -92,10 +94,14 @@ module.exports = {
     },
     operation: {
       inputFields: [
-        {key: 'style', type: 'string', helpText: 'Explain what style of cuisine this is.'},
+        {
+          key: 'style',
+          type: 'string',
+          helpText: 'Explain what style of cuisine this is.',
+        },
       ],
       perform: listDocuments,
-      sample: sample
+      sample: sample,
     },
   },
   // If your app supports webhooks, you can define a hook method instead of a list method.
@@ -112,13 +118,28 @@ module.exports = {
     },
     operation: {
       inputFields: [
-        {key: 'name', required: true, type: 'string'},
-        {key: 'directions', required: true, type: 'text', helpText: 'Explain how should one make the document, step by step.'},
-        {key: 'authorId', required: true, type: 'integer', label: 'Author ID'},
-        {key: 'style', required: false, type: 'string', helpText: 'Explain what style of cuisine this is.'},
+        { key: 'name', required: true, type: 'string' },
+        {
+          key: 'directions',
+          required: true,
+          type: 'text',
+          helpText: 'Explain how should one make the document, step by step.',
+        },
+        {
+          key: 'authorId',
+          required: true,
+          type: 'integer',
+          label: 'Author ID',
+        },
+        {
+          key: 'style',
+          required: false,
+          type: 'string',
+          helpText: 'Explain what style of cuisine this is.',
+        },
       ],
       perform: createDocument,
-      sample: sample
+      sample: sample,
     },
   },
   // The search method on this resource becomes a Search on this app
@@ -128,11 +149,9 @@ module.exports = {
       description: 'Finds an existing document by name.',
     },
     operation: {
-      inputFields: [
-        {key: 'name', required: true, type: 'string'},
-      ],
+      inputFields: [{ key: 'name', required: true, type: 'string' }],
       perform: searchDocument,
-      sample: sample
+      sample: sample,
     },
   },
 
@@ -146,11 +165,11 @@ module.exports = {
   // outputFields: () => { return []; }
   // Alternatively, a static field definition should be provided, to specify labels for the fields
   outputFields: [
-    {key: 'id', label: 'ID'},
-    {key: 'createdAt', label: 'Created At'},
-    {key: 'name', label: 'Name'},
-    {key: 'directions', label: 'Directions'},
-    {key: 'authorId', label: 'Author ID'},
-    {key: 'style', label: 'Style'},
-  ]
+    { key: 'id', label: 'ID' },
+    { key: 'createdAt', label: 'Created At' },
+    { key: 'name', label: 'Name' },
+    { key: 'directions', label: 'Directions' },
+    { key: 'authorId', label: 'Author ID' },
+    { key: 'style', label: 'Style' },
+  ],
 };

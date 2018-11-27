@@ -4,7 +4,8 @@
   "description": "A Zapier end point for mongoDb mLab REST API.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "mocha --recursive",
+    "lint": "prettier --write --single-quote --trailing-comma=all --arrow-parens=always **/*.{js,json}"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "mocha": "^5.2.0",
+    "prettier": "^1.15.2",
     "should": "^13.2.0"
   }
 }
