@@ -1,10 +1,5 @@
 const Document = require('./resources/document');
-
-const addAuthHeader = (request, z, bundle) => {
-  // Hard-coded authentication just for demo
-  request.headers['X-API-Key'] = 'secret';
-  return request;
-};
+const Authentication = require('./authentication');
 
 // Now we can roll up all our behaviors in an App.
 const App = {
@@ -13,7 +8,9 @@ const App = {
   version: require('./package.json').version,
   platformVersion: require('zapier-platform-core').version,
 
-  beforeRequest: [addAuthHeader],
+  authentication: Authentication.authentication,
+
+  beforeRequest: [Authentication.addApiKey],
 
   afterResponse: [],
 
