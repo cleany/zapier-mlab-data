@@ -1,70 +1,69 @@
-const _sharedBaseUrl = 'https://auth-json-server.zapier.ninja';
+const getBaseUrl = (bundle) => {
+  const sharedBaseUrl = 'https://api.mlab.com/api/1';
 
-const getDocument = (z, bundle) => {
-  return z
-    .request({
-      url: `${_sharedBaseUrl}/recipes/${bundle.inputData.id}`,
-    })
-    .then((response) => JSON.parse(response.content));
+  return `${sharedBaseUrl}/databases/${bundle.authData.dbName}/collections/${
+    bundle.inputData.collection
+  }`;
 };
 
-const listDocuments = (z, bundle) => {
-  return z
-    .request({
-      url: _sharedBaseUrl + '/recipes',
-      params: {
-        style: bundle.inputData.style,
-      },
-    })
-    .then((response) => JSON.parse(response.content));
+const addId = (doc) => {
+  return Object.assign({ id: doc._id['$oid'] }, doc);
 };
 
-const createDocument = (z, bundle) => {
-  const requestOptions = {
-    url: _sharedBaseUrl + '/recipes',
-    method: 'POST',
-    body: JSON.stringify({
-      name: bundle.inputData.name,
-      directions: bundle.inputData.directions,
-      authorId: bundle.inputData.authorId,
-    }),
-    headers: {
-      'content-type': 'application/json',
-    },
-  };
+const getDocument = async (z, bundle) => {
+  const response = await z.request({
+    url: `${getBaseUrl(bundle)}/${bundle.inputData.id}`,
+  });
 
-  return z
-    .request(requestOptions)
-    .then((response) => JSON.parse(response.content));
+  if (response.status !== 200) {
+    throw new Error(response.content);
+  }
+
+  return addId(z.JSON.parse(response.content));
 };
 
-const searchDocument = (z, bundle) => {
-  return z
-    .request({
-      url: _sharedBaseUrl + '/recipes',
-      params: {
-        nameSearch: bundle.inputData.name,
-      },
-    })
-    .then((response) => {
-      const matchingDocuments = JSON.parse(response.content);
+const listDocuments = async (z, bundle) => {
+  let query;
 
-      // Only return the first matching document
-      if (matchingDocuments && matchingDocuments.length) {
-        return [matchingDocuments[0]];
-      }
+  if (bundle.inputData.query === undefined) {
+    query = '{}';
+  } else if (typeof bundle.inputData.query !== 'string') {
+    query = z.JSON.stringify(bundle.inputData.query);
+  } else if (bundle.inputData.query !== '') {
+    query = bundle.inputData.query;
+  }
 
-      return [];
-    });
+  const response = await z.request({
+    url: `${getBaseUrl(bundle)}?q=${query})`,
+  });
+  if (response.status !== 200) {
+    throw new Error(response.content);
+  }
+
+  return z.JSON.parse(response.content).map(addId);
 };
+
+const createDocument = () => {};
 
 const sample = {
-  id: 1,
-  createdAt: 1472069465,
-  name: 'Best Spagetti Ever',
-  authorId: 1,
-  directions: '1. Boil Noodles\n2.Serve with sauce',
-  style: 'italian',
+  id: '5abd1f34ed2d1d01049e7be7',
+  _id: {
+    $oid: '5abd1f34ed2d1d01049e7be7',
+  },
+  account: {
+    id: '0010Y00000SeRx0QAF',
+    name: 'Notify',
+    address: '41 rue de Prony, 75017 Paris',
+  },
+  owner: {
+    id: '0030Y00000KBxKfQAL',
+    name: 'Sébastien Boulle',
+  },
+  logType: 'visit',
+  date: '2018-03-29T17:15:25Z',
+  comment: 'Test visite 1',
+  __v: 0,
+  auto_tags: ['OTHER'],
 };
 
 // This file exports a Document resource. The definition below contains all of the keys available,
@@ -81,7 +80,10 @@ module.exports = {
       description: 'Gets a document.',
     },
     operation: {
-      inputFields: [{ key: 'id', required: true }],
+      inputFields: [
+        { key: 'collection', required: true },
+        { key: 'id', required: true },
+      ],
       perform: getDocument,
       sample: sample,
     },
@@ -94,11 +96,8 @@ module.exports = {
     },
     operation: {
       inputFields: [
-        {
-          key: 'style',
-          type: 'string',
-          helpText: 'Explain what style of cuisine this is.',
-        },
+        { key: 'collection', required: true },
+        { key: 'query', required: true },
       ],
       perform: listDocuments,
       sample: sample,
@@ -118,30 +117,14 @@ module.exports = {
     },
     operation: {
       inputFields: [
-        { key: 'name', required: true, type: 'string' },
-        {
-          key: 'directions',
-          required: true,
-          type: 'text',
-          helpText: 'Explain how should one make the document, step by step.',
-        },
-        {
-          key: 'authorId',
-          required: true,
-          type: 'integer',
-          label: 'Author ID',
-        },
-        {
-          key: 'style',
-          required: false,
-          type: 'string',
-          helpText: 'Explain what style of cuisine this is.',
-        },
+        { key: 'collection', required: true },
+        { key: 'data', required: true },
       ],
       perform: createDocument,
       sample: sample,
     },
   },
+
   // The search method on this resource becomes a Search on this app
   search: {
     display: {
@@ -149,8 +132,11 @@ module.exports = {
       description: 'Finds an existing document by name.',
     },
     operation: {
-      inputFields: [{ key: 'name', required: true, type: 'string' }],
-      perform: searchDocument,
+      inputFields: [
+        { key: 'collection', required: true },
+        { key: 'query', required: true },
+      ],
+      perform: listDocuments,
       sample: sample,
     },
   },
@@ -160,16 +146,5 @@ module.exports = {
   // returned records, and have obviously dummy values that we can show to any user.
   sample: sample,
 
-  // If the resource can have fields that are custom on a per-user basis, define a function to fetch the custom
-  // field definitions. The result will be used to augment the sample.
-  // outputFields: () => { return []; }
-  // Alternatively, a static field definition should be provided, to specify labels for the fields
-  outputFields: [
-    { key: 'id', label: 'ID' },
-    { key: 'createdAt', label: 'Created At' },
-    { key: 'name', label: 'Name' },
-    { key: 'directions', label: 'Directions' },
-    { key: 'authorId', label: 'Author ID' },
-    { key: 'style', label: 'Style' },
-  ],
+  outputFields: [],
 };
