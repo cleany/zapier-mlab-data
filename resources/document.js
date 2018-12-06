@@ -34,7 +34,7 @@ const listDocuments = async (z, bundle) => {
   }
 
   const response = await z.request({
-    url: `${getBaseUrl(bundle)}?q=${query})`,
+    url: `${getBaseUrl(bundle)}?q=${query}`,
   });
   if (response.status !== 200) {
     throw new Error(response.content);
@@ -43,7 +43,36 @@ const listDocuments = async (z, bundle) => {
   return z.JSON.parse(response.content).map(addId);
 };
 
-const createDocument = () => {};
+const createDocument = async (z, bundle) => {
+  let data = bundle.inputData.data;
+
+  if (typeof data === 'string') {
+    data = z.JSON.parse(data);
+  }
+
+  if (data instanceof Array && data.length !== 1) {
+    throw new z.errors.HaltedError('only a single item is allowed in create');
+  }
+  if (data instanceof Array) {
+    data = data[0];
+  }
+  data = z.JSON.stringify(data);
+
+  const response = await z.request({
+    url: getBaseUrl(bundle),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: data,
+  });
+
+  if (![200, 201].includes(response.status)) {
+    throw new Error(response.content);
+  }
+
+  return addId(z.JSON.parse(response.content));
+};
 
 const sample = {
   id: '5abd1f34ed2d1d01049e7be7',
@@ -103,17 +132,13 @@ module.exports = {
       sample: sample,
     },
   },
-  // If your app supports webhooks, you can define a hook method instead of a list method.
-  // Zapier will turn this into a webhook Trigger on the app.
-  // hook: {
-  //
-  // },
 
   // The create method on this resource becomes a Write on this app
   create: {
     display: {
-      label: 'Create Document',
-      description: 'Creates a new document.',
+      label: 'Create or Update Document',
+      description:
+        'Creates a new document, or update it if _id already exists.',
     },
     operation: {
       inputFields: [
